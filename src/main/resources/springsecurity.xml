@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans
+        xmlns="http://www.springframework.org/schema/security"
+        xmlns:beans="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+						http://www.springframework.org/schema/beans/spring-beans.xsd
+						http://www.springframework.org/schema/security
+						http://www.springframework.org/schema/security/spring-security.xsd">
+
+
+    <!-- 以下页面不被拦截 -->
+    <!--登录页面，登录错误页面，注册页面，注册请求路径-->
+    <http pattern="/home.html" security="none"/>
+    <http pattern="/login.html" security="none"/>
+    <http pattern="/login_failure.html" security="none"/>
+    <!--静态资源-->
+    <http pattern="/css/**" security="none"/>
+    <http pattern="/img/**" security="none"/>
+    <http pattern="/js/**" security="none"/>
+    <http pattern="/plugins/**" security="none"/>
+
+    <http auto-config="true" use-expressions="true">
+        <intercept-url pattern="/**" access="hasRole('ROLE_USER')" />
+        <!-- 配置自定义的页面实现登录验证效果
+        login-page指定登录的页面 拥有拦截跳转页面
+        login-processing-url 登录请求url 登录form表单中的action的值
+        default-target-url 登录成功跳转的页面
+         -->
+        <form-login login-page="/login.html" login-processing-url="/login"
+                             default-target-url="/login_success.html"
+                             authentication-failure-url="/login_failure.html"/>
+        <!-- 登录成功无权限跳转的页面 -->
+        <access-denied-handler error-page="/logout_success.html"/>
+
+        <!-- csrf跨域的网络攻击 -->
+        <csrf disabled="true"/>
+    </http>
+
+    <!-- 用户登录权限验证管理 -->
+    <authentication-manager>
+        <!-- 框架验证的支持者 -->
+        <authentication-provider user-service-ref="authService"/>
+        <authentication-provider>
+            <!-- 验证密码和权限的实现业务类 user-service 框架自带的判断业务类 -->
+            <user-service>
+                <!-- 自定义用户名为user  密码为user  拥有的角色为ROLE_USER
+                {noop} 代表密码的判断是明文方式 不需要解密
+                默认验证是加密的密码
+                 -->
+                <user name="user" password="{noop}user" authorities="ROLE_USER"/>
+                <user name="admin" password="{noop}admin" authorities="ROLE_ADMIN"/>
+            </user-service>
+        </authentication-provider>
+    </authentication-manager>
+    
+    
+</beans:beans>

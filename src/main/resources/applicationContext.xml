@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <description>spring配置文件</description>
+
+    <context:component-scan base-package="com.jwt.ssd.service"/>
+
+    <!--数据库连接池-->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="com.mysql.jdbc.Driver"/>
+        <property name="jdbcUrl" value="jdbc:mysql://localhost:3306/springsecurity?useCharacterEncoding=UTF-8"/>
+        <property name="user" value="root"/>
+        <property name="password" value="root"/>
+    </bean>
+
+    <!--获取SqlSessionFactory工厂对象-->
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <!--提供一个数据源给工厂对象，就可以生成操作数据库的SqlSession对象，并交给IOC容器管理-->
+        <property name="dataSource" ref="dataSource"/>
+        <!--扫描pojo包路径下的对象，给其起别名-->
+        <property name="typeAliasesPackage" value="com.jwt.ssd.pojo"/>
+    </bean>
+
+    <!--扫描dao包路径，生成代理对象，并交给IOC容器管理-->
+    <bean id="mapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.jwt.ssd.dao"/>
+    </bean>
+
+</beans>
